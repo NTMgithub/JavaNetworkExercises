@@ -86,11 +86,13 @@ public class Server {
                                 Elements cityName = doc.select("#search-results > div:nth-child(1) > article > div > div.data > table > tbody > tr:nth-child(9) > td:nth-child(2)");
                                 Elements countryName = doc.select("#search-results > div:nth-child(1) > article > div > div.data > table > tbody > tr:nth-child(2) > td:nth-child(2)");
                                 Elements continentName = doc.select("#search-results > div:nth-child(1) > article > div > div.data > table > tbody > tr:nth-child(1) > td:nth-child(2)");
+                                Elements organizationName = doc.select("#search-results > div:nth-child(1) > article > div > div.data > table > tbody > tr:nth-child(16) > td:nth-child(2)");
                                 
                                 if (cityName.isEmpty()){
                                     dataOutputStream.writeUTF("Không tìm thấy dữ liệu!");
                                 }else{
-                                    dataOutputStream.writeUTF(ANSI_GREEN + "Thành phố: " + cityName.text().toUpperCase() + "\n" +
+                                    dataOutputStream.writeUTF(ANSI_GREEN + "Tên tổ chức: " + organizationName.text().toUpperCase() + "\n" +
+                                                            ANSI_GREEN + "Thành phố: " + cityName.text().toUpperCase() + "\n" +
                                                           ANSI_GREEN + "Quốc gia: " + countryName.text().toUpperCase() + "\n" +
                                                            ANSI_GREEN + "Châu lục: " + continentName.text().toUpperCase() + ANSI_RESET);
                                 }
@@ -101,7 +103,7 @@ public class Server {
                             dataOutputStream.writeUTF(ANSI_CYAN + "Không đúng định dạng!" + "\n" + 
                                                      ANSI_CYAN +  "Hướng dẫn:" + "\n" +
                                                      ANSI_CYAN + "hello: hiển thị private IP, public IP của Server" + "\n" +
-                                                     ANSI_CYAN +  "req x: hiển thị thông tin thành phố, quốc gia, châu lục. Với x là địa chỉ IPv4" + ANSI_RESET);
+                                                     ANSI_CYAN +  "req x: hiển thị thông tin thành phố, quốc gia, châu lục."+ "\n" + "Với x là địa chỉ IPv4" + ANSI_RESET);
                         }
                         
                     }
