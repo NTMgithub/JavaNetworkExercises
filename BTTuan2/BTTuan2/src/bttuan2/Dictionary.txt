@@ -1,0 +1,3 @@
+hello;xin chao
+goodbye;tam biet
+thank you;cam on

@@ -1,0 +1,5 @@
+hello;xin chào
+goodbye;tạm biệt
+thank you;cảm ơn
+article;bài báo
+pattern;kiểu mẫu
