@@ -38,6 +38,7 @@ public class Server {
                 String receiveData = dataInputStream.readUTF();
                 System.out.println("Client đã gửi: " + receiveData);
                 
+                if (receiveData.equals("bye")) break;
                 
                 ketQua = Server.TinhCanBan(receiveData);
                 
@@ -55,9 +56,10 @@ public class Server {
             }
             
             //Đóng các luồng (close theo đúng thứ tự)
-            //dataOutputStream.close();
-            //dataInputStream.close();
-            //socket.close();
+            dataOutputStream.close();
+            dataInputStream.close();
+            socket.close();
+            serverSocket.close();
            
         } catch (IOException ex) {
             System.out.println("Lỗi nhập xuất!");

@@ -151,7 +151,7 @@ public class Server {
         URL connectURL;
         String publicIP = "";
         try {
-            connectURL = new URL("http://bot.whatismyipaddress.com/");
+            connectURL = new URL("http://checkip.amazonaws.com");
             BufferedReader in = new BufferedReader(new InputStreamReader(connectURL.openStream()));
             publicIP = in.readLine();
             in.close();
