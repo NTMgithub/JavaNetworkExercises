@@ -25,7 +25,7 @@ public class Client {
             String sendData;
             
             while(true){
-                System.out.print("Nhập CMND: ");
+                System.out.print("Nhập: ");
                 sendData = sc.nextLine();
                 
                 if (sendData.equals("bye")) break; 
@@ -38,7 +38,6 @@ public class Client {
                 String receiveLine = dataInputStream.readUTF();
                 System.out.println(receiveLine); 
                 
-                  
                 
             }
             
@@ -52,7 +51,6 @@ public class Client {
         }
         
     }
-    
     
     
     /**

@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
+import org.jsoup.Connection;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -43,6 +45,14 @@ public class Server {
                 dataInputStream = new DataInputStream(socket.getInputStream());
 
                 Document doc = null;
+                Document doc2 = null;
+                Response response = null;
+                Document getPage = null;
+                String hoTen = "";
+                String noiSinh = "";
+                String nganhHoc = "";
+                String khoaDaoTao = "";
+                String diemHocKy = "";
 
                 while (true) {
                     //Nhận dữ liệu từ client
@@ -52,22 +62,63 @@ public class Server {
                     if (receiveData.equals("bye")) {
                         break;
                     }
-
                     
                     
-                    //doc = Server.GetDocumentMaSoThue(receiveData);
-                    //Elements eHoTen = doc.select("#main > section:nth-child(1) > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > span > a");
-                    //Elements eQueQuan = doc.select("#main > section:nth-child(1) > div > table > tbody > tr:nth-child(2) > td:nth-child(2) > span");
+                    String url = "http://thongtindaotao.sgu.edu.vn/default.aspx?page=nhapmasv&flag=XemDiemThi";
+                    String url2 = "http://thongtindaotao.sgu.edu.vn/Default.aspx?page=xemdiemthi&id=" + receiveData;
+                    //get thông tin request data trước
+                    getPage = Jsoup.connect(url).get();
+                    //get cookies
+                    response = Jsoup.connect(url).method(Connection.Method.GET).execute();
 
-//                    if (!eHoTen.text().equals("")) {
-//                        dataOutputStream.writeUTF(ANSI_GREEN + "Họ tên: " + ANSI_RESET + eHoTen.text() + "\n"
-//                                + ANSI_GREEN + "Quê quán: " + ANSI_RESET + eQueQuan.text());
-//                    } else {
-//                        dataOutputStream.writeUTF("Không tìm thấy dữ liệu!");
-//                    }
+                    doc = Jsoup.connect(url)
+                            .data("__EVENTTARGET", "")
+                            .data("__EVENTARGUMENT", "")
+                            .data("__VIEWSTATE", getPage.getElementById("__VIEWSTATE").val())
+                            .data("ctl00$ContentPlaceHolder1$ctl00$txtMaSV", receiveData)
+                            .data("ctl00$ContentPlaceHolder1$ctl00$btnOK", "OK")
+                            .cookies(response.cookies())
+                            .method(Connection.Method.POST)
+                            .post();
+                    
+                    try {
+                        hoTen = doc.getElementById("ctl00_ContentPlaceHolder1_ctl00_ucThongTinSV_lblTenSinhVien").text();
+                        noiSinh = doc.getElementById("ctl00_ContentPlaceHolder1_ctl00_ucThongTinSV_lblNoiSinh").text();
+                        nganhHoc = doc.getElementById("ctl00_ContentPlaceHolder1_ctl00_ucThongTinSV_lbNganh").text();
+                        khoaDaoTao = doc.getElementById("ctl00_ContentPlaceHolder1_ctl00_ucThongTinSV_lblKhoaHoc").text();
+                        
+                        //Truyền thông tin request data của trang doc vào để lấy điểm học kỳ bất kỳ
+                        doc2 = Jsoup.connect(url2)
+                                .data("__EVENTTARGET", "")
+                                .data("__EVENTARGUMENT", "")
+                                .data("__VIEWSTATE", doc.getElementById("__VIEWSTATE").val())
+                                .data("__VIEWSTATEGENERATOR", doc.getElementById("__VIEWSTATEGENERATOR").val())
+                                .data("ctl00$ContentPlaceHolder1$ctl00$txtChonHK", "20192") //20 -> 2020; 19 -> 2019 ; 2 -> học kỳ 2
+                                .data("ctl00$ContentPlaceHolder1$ctl00$btnChonHK", "Xem")
+                                .cookies(response.cookies())
+                                .post();
 
+                        //doc2 = res.parse();
+                        Elements rowDiem = doc2.getElementsByClass("row-diem");
+
+                        for (Element item : rowDiem) {
+                            diemHocKy += item.select("td").get(1).text()
+                                    + " - " + item.select("td").get(2).text()
+                                    + " - " + item.select("td").get(9).text() + "\n";
+                        }
+
+                        dataOutputStream.writeUTF(ANSI_GREEN + "Họ tên: " + hoTen + "\n" +
+                                                  ANSI_GREEN + "Nơi sinh: " + noiSinh + "\n" +
+                                                  ANSI_GREEN + "Ngành: " + nganhHoc + "\n" +
+                                                  ANSI_GREEN + "Khóa: " + khoaDaoTao + "\n" + ANSI_RESET +
+                                                  "Điểm chi tiết: Học kỳ 2 năm 2019 - 2020\n" + diemHocKy);
+                        // System.out.println(doc2.toString());
+                    } catch (NullPointerException e) {
+                        dataOutputStream.writeUTF("Không tìm thấy dữ liệu!");
+                    }
+                        
                     dataOutputStream.flush();//gửi
-
+                    
                 }
 
                 //Đóng các luồng (close theo đúng thứ tự)
@@ -85,36 +136,18 @@ public class Server {
     }
     
 
-    
-    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
         int port = 1234;
-        Document doc = null;
-        String mssv = "";
-        //MainServer(port);
-       
-        doc = Jsoup.connect("http://thongtindaotao.sgu.edu.vn/Default.aspx?page=xemdiemthi&id=3118410262").get();
+        MainServer(port);
         
-        //Elements table = doc.getElementsByClass("title-hk-diem");
-        
-        Elements rows = doc.select("#ctl00_ContentPlaceHolder1_ctl00_div1 > table");
-       
-         //System.out.println(rows.text());
-         
-        for (int i = 1; i < rows.size(); i++) { //first row is the col names so skip it.
-            Element row = rows.get(i);
-            Elements cols = row.select("tbody");
-
-            System.out.println(cols.get(0).text());
-            
-        
-        }
-        
-        
-            
+                        
+    
     }
+    
+    
+    
     
 }
