@@ -5,25 +5,16 @@
  */
 package bttuan6.Bai3;
 
-import bttuan6.Bai2.*;
-import bttuan6.Bai1.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.text.NumberFormat;
-import java.util.Scanner;
+import java.net.URLEncoder;
 import java.util.StringTokenizer;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.jsoup.Connection;
-import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
@@ -54,14 +45,8 @@ public class Server {
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 dataInputStream = new DataInputStream(socket.getInputStream());
 
-                Document docProduct = null;
-                Document docReview = null;
-                String productID = "";
-                String productName = "";
-                int productPrice;
+                Document doc = null;
                 
-                String reviewList = "";
-
                 while (true) {
                     //Nhận dữ liệu từ client
                     String receiveData = dataInputStream.readUTF();
@@ -72,6 +57,18 @@ public class Server {
                     }
                     
                     
+                    if(!CheckFormat(receiveData)){
+                        dataOutputStream.writeUTF(ANSI_RED+ "Không đúng định dạng!" + ANSI_RESET);
+                    }else{
+                        String stringURL = URLEncoder.encode(receiveData);
+
+                        doc = Jsoup.connect("https://www.google.com/search?q=" + stringURL).get();
+
+                        Elements stringCongThuc = doc.select("#rso > div.ULSxyf > div > div > div.card-section > div > div > div.BRpYC > div.TIGsTb > div.xwgN1d.XSNERd > div > span");
+                        Elements stringKetQua = doc.select("#cwos");
+
+                        dataOutputStream.writeUTF(ANSI_GREEN + stringCongThuc.text() + " " + stringKetQua.text() + ANSI_RESET);
+                    }
                     
                     
                     dataOutputStream.flush();//gửi
@@ -92,6 +89,29 @@ public class Server {
 
     }
     
+    public static boolean CheckFormat(String stringInput){
+        StringTokenizer strToken = new StringTokenizer(stringInput, "+-*/");
+        
+        while(strToken.hasMoreTokens()){
+            if (!isNumeric(strToken.nextToken())){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+    
    
     
     /**
@@ -99,19 +119,9 @@ public class Server {
      */
     public static void main(String[] args) throws IOException {
         int port = 1234;
-        //MainServer(port);
+        MainServer(port);
    
-        Document doc = null;        
         
-        doc = Jsoup.connect("https://www.google.com/search?q=12%2B34-56*78%2F4%2B14-17").get();
-       
-        Elements stringCongThuc = doc.select("#rso > div.ULSxyf > div > div > div.card-section > div > div > div.BRpYC > div.TIGsTb > div.xwgN1d.XSNERd > div > span");
-        Elements stringKetQua = doc.select("#cwos");
-        
-        System.out.println(stringCongThuc.text() + stringKetQua.text());
-        
-        
-     
     }
     
     

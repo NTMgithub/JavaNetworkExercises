@@ -1,8 +1,7 @@
 
 package bttuan6.Bai3;
 
-import bttuan6.Bai2.*;
-import bttuan6.Bai1.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
