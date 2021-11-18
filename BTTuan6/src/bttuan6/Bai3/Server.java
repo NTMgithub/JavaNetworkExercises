@@ -99,8 +99,18 @@ public class Server {
      */
     public static void main(String[] args) throws IOException {
         int port = 1234;
-        MainServer(port);
+        //MainServer(port);
    
+        Document doc = null;        
+        
+        doc = Jsoup.connect("https://www.google.com/search?q=12%2B34-56*78%2F4%2B14-17").get();
+       
+        Elements stringCongThuc = doc.select("#rso > div.ULSxyf > div > div > div.card-section > div > div > div.BRpYC > div.TIGsTb > div.xwgN1d.XSNERd > div > span");
+        Elements stringKetQua = doc.select("#cwos");
+        
+        System.out.println(stringCongThuc.text() + stringKetQua.text());
+        
+        
      
     }
     
