@@ -1,0 +1,6 @@
+hello;xin chào
+new;mới
+friend;bạn bè
+friendly;thân thiện
+best;tốt
+player;người chơi
